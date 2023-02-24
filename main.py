@@ -28,6 +28,10 @@ NewList = []
 FileNames=[]
 Folder_names = []
 
+def writetofile(error:str):
+    with open("erors.txt",'a',encoding='utf-8',errors='ignore')as e:
+        e.write(error+"\n")
+
 def center(var:str, space:int=None): # From Pycenter
     if not space:
         space = (os.get_terminal_size().columns - len(var.splitlines()[int(len(var.splitlines())/2)])) / 2
@@ -66,6 +70,42 @@ def ErrorRemover(func):
 
     return wrapper
 
+
+class delete:
+    def __init__(self,filetype:str) -> None:
+        self.filetype = filetype
+        self.removed = []
+
+
+    def filedeleter(self,folder_path:str):
+        global NewList
+        self.start = time.time()
+        self.deleter(folder_path)
+        os.system("cls")
+        print(center(rc+Name))
+        print(f"{rc}FilesRemoved{res}:{str(len(self.removed))}\n{rc}elapsed{res}:{str(int(time.time())-self.start)}")
+
+
+    def deleter(self,folder_path:str):
+        try:
+            for file_or_folder in os.listdir(folder_path):
+                try:
+                    floder =path.join(folder_path ,file_or_folder)
+                    if path.isfile(floder):
+                        if path.splitext(floder)[1] == self.filetype:
+                            os.remove(floder)
+                            self.removed.append(floder)
+                    elif path.isdir(floder):
+                        try:
+                            self.deleter(floder)
+                        except Exception as e:
+                            writetofile(e)
+                            
+                except Exception as e:
+                            writetofile(e)
+        except Exception as e:
+                            writetofile(e)
+
 class Scavanger:
     def __init__(self) -> None:
         pass
@@ -83,8 +123,9 @@ class Scavanger:
                 try:
                     line = line.replace(",",":")
                     
-                except:
-                    pass
+                except Exception as e:
+                            writetofile(e)
+
                 if len(line.split(":")[0]) < 4 or len(line.split(":")[1]) <4:
                     pass
                 
@@ -92,16 +133,17 @@ class Scavanger:
                     try:
                                 line = line.replace(",",":")
                                 
-                    except:
-                        pass
+                    except Exception as e:
+                            writetofile(e)
                     try:
                         line.split(":")[1]
                         NewList.append(line.strip())
-                    except:pass
+                    except Exception as e:
+                            writetofile(e)
                         
                         
-            except:
-                pass
+            except Exception as e:
+                            writetofile(e)
                     
             
         NewList = Editor.CLEANER(listt=NewList)
@@ -212,7 +254,7 @@ while True:
         os.system("cls")
         ctypes.windll.kernel32.SetConsoleTitleW("Megatron VER 2.0 Proggramed By:IQTHEGOAT#0310")
         print(rc+Name)
-        CLI = f"{res}[{rc}1{res}] File Sorter\n[{rc}2{res}] Scavange Combos From Folder (csv,txt)\n{res}[{rc}3{res}]Exit Tool"
+        CLI = f"{res}[{rc}1{res}] File Sorter\n[{rc}2{res}] Scavange Combos From Folder (csv,txt)\n{res}[{rc}3{res}]delete specefic file ext{res}\n[{rc}4{res}]Exit Tool"
         print(center(CLI))
         choice = input(center(f"\n{rc}D{res}ombo{rc}C{res}umper:"))
         scav = Scavanger()
@@ -237,8 +279,16 @@ while True:
 
         elif int(choice) == 2:
             scav.comboscavanger(getcombo("Folder"))
-        
+
         elif int(choice) == 3:
+            try:
+                r = input("what filetype:")
+            except:
+                r = input("what filetype:")
+            deleter = delete(r)
+            deleter.filedeleter(getcombo("Main-Folder"))
+
+        elif int(choice) == 4:
             break
     except:
         pass
