@@ -3,12 +3,27 @@ import hashlib
 import os.path as path
 import time,sys
 import tkinter.filedialog as fd
-from yaspin import yaspin,Spinner
 import colorama,random,datetime,socket
 from ComboEditor.Editor import Editor
-from discord import SyncWebhook
 import ctypes
+import platform
 
+
+def clear_screen():
+    """Clear the terminal screen."""
+    system = platform.system().lower()
+    if system == "windows":
+        os.system("cls")
+    elif system == "linux":
+        os.system("clear")
+
+def set_terminal_title(title):
+    system = platform.system().lower()
+    if system == "windows":
+        ctypes.windll.kernel32.SetConsoleTitleW(title)
+    elif system in ["linux", "darwin"]:
+        print(f"\033]0;{title}\007")
+        
 def send_to_webhook(webhook,message):
         webhook = SyncWebhook.from_url(webhook)
         webhook.send(message)
@@ -29,28 +44,28 @@ FileNames=[]
 Folder_names = []
 
 def writetofile(error:str):
-    with open("erors.txt",'a',encoding='utf-8',errors='ignore')as e:
-        e.write(error+"\n")
+    with open("errors.txt",'a',encoding='utf-8',errors='ignore')as e:
+        e.write(str(error)+"\n")
 
-def center(var:str, space:int=None): # From Pycenter
-    if not space:
-        space = (os.get_terminal_size().columns - len(var.splitlines()[int(len(var.splitlines())/2)])) / 2
-    
-    return "\n".join((' ' * int(space)) + var for var in var.splitlines())
+import os
+import shutil
 
+def center(var: str):
+    """Center the text within the terminal."""
+    term_width, _ = shutil.get_terminal_size()
+
+    lines = var.splitlines()
+    centered_lines = [(term_width - len(line)) // 2 * " " + line for line in lines]
+
+    return "\n".join(centered_lines)
+
+# Example usage:
 Name = center("""
 
- /$$      /$$ /$$$$$$$$  /$$$$$$   /$$$$$$  /$$    /$$$$$$$$ /$$$$$$$   /$$$$$$  /$$   /$$
-| $$$    /$$$| $$_____/ /$$__  $$ /$$__  $$| $$   |__  $$__/| $$__  $$ /$$__  $$| $$$ | $$
-| $$$$  /$$$$| $$      | $$  \__/| $$  \ $$| $$      | $$   | $$  \ $$| $$  \ $$| $$$$| $$
-| $$ $$/$$ $$| $$$$$   | $$ /$$$$| $$$$$$$$| $$      | $$   | $$$$$$$/| $$  | $$| $$ $$ $$
-| $$  $$$| $$| $$__/   | $$|_  $$| $$__  $$| $$      | $$   | $$__  $$| $$  | $$| $$  $$$$
-| $$\  $ | $$| $$      | $$  \ $$| $$  | $$| $$      | $$   | $$  \ $$| $$  | $$| $$\  $$$
-| $$ \/  | $$| $$$$$$$$|  $$$$$$/| $$  | $$| $$$$$$$$| $$   | $$  | $$|  $$$$$$/| $$ \  $$
-|__/     |__/|________/ \______/ |__/  |__/|________/|__/   |__/  |__/ \______/ |__/  \__/
-                                                                                          
-                                                                                          
+MEGALTRON                                       
                                                                                           """)
+
+
 
 
 def ErrorRemover(func):
@@ -81,7 +96,7 @@ class delete:
         global NewList
         self.start = time.time()
         self.deleter(folder_path)
-        os.system("cls")
+        os.system
         print(center(rc+Name))
         print(f"{rc}FilesRemoved{res}:{str(len(self.removed))}\n{rc}elapsed{res}:{str(int(time.time())-self.start)}")
 
@@ -124,7 +139,7 @@ class Scavanger:
                     line = line.replace(",",":")
                     
                 except Exception as e:
-                            writetofile(e)
+                        writetofile(e)
 
                 if len(line.split(":")[0]) < 4 or len(line.split(":")[1]) <4:
                     pass
@@ -147,7 +162,7 @@ class Scavanger:
                     
             
         NewList = Editor.CLEANER(listt=NewList)
-        os.system("cls")
+        #clear_screen()
         print(center(rc+Name))
         elapsed = float(time.time()) - float(self.start)  
         print(center(f"{res}[{rc}Scavanged Lines:{res}{self.Count}]\n[{rc}Scavanged Files:{res}{len(list(self.filenames))}]\n[{rc}FilesPerMinute:{res}{int((len(list(self.filenames))/elapsed)*60)}]\n[{rc}FoldersPerMinute:{res}{(int(len(list(self.foldernames))/elapsed)*60)}]\n[{rc}Scavanged Folders:{res}{int(len(list(self.foldernames)))}]\n[{rc}Time Elapsed:{res}{int(elapsed)} Seconds]\n[{rc}Developer:{res}IQTHEGOAT#0310]"))
@@ -249,49 +264,48 @@ def get_hashtype(h):
 
 
 
-while True:
-    try:
-        os.system("cls")
-        ctypes.windll.kernel32.SetConsoleTitleW("Megatron VER 2.0 Proggramed By:IQTHEGOAT#0310")
-        print(rc+Name)
-        CLI = f"{res}[{rc}1{res}] File Sorter\n[{rc}2{res}] Scavange Combos From Folder (csv,txt)\n{res}[{rc}3{res}]delete specefic file ext{res}\n[{rc}4{res}]Exit Tool"
-        print(center(CLI))
-        choice = input(center(f"\n{rc}D{res}ombo{rc}C{res}umper:"))
-        scav = Scavanger()
-        if int(choice) == 1:
-            try:
-                rev = input(center(f"\n\nreversed?:[{rc}y{res},{rc}n{res}]:"))
-            except:
-                rev = input(center(f"\n\nreversed?:[{rc}y{res},{rc}n{res}]:"))
-            if rev.lower() == 'y':
-                rev = True
-            elif rev.lower() == 'n':
-                rev = False
-            r = scav.Sorting(getfile("File to be Sorted"),rev)
-            namy =  '[Item - Sorter] {'+str(datetime.datetime.now())[:-7].replace(':','-')+'}.txt'
-            try:
-                    os.mkdir(os.getcwd()+"\\output")
-            except:
-                    pass
-            with open(f"{os.getcwd()}\\output\\{namy}",'a',encoding="utf-8",errors="ignore")as a:
-                for line in r:
-                    a.write(line.strip()+'\n')
+try:
+    clear_screen()
+    set_terminal_title("Megatron VER 2.0 Proggramed By:IQTHEGOAT#0310")
+    print(rc+Name)
+    CLI = f"{res}[{rc}1{res}] File Sorter\n[{rc}2{res}] Scavange Combos From Folder (csv,txt)\n{res}[{rc}3{res}]delete specefic file ext{res}\n[{rc}4{res}]Exit Tool"
+    print(center(CLI))
+    choice = input(center(f"\n{rc}D{res}ombo{rc}C{res}umper:"))
+    scav = Scavanger()
+    if int(choice) == 1:
+        try:
+            rev = input(center(f"\n\nreversed?:[{rc}y{res},{rc}n{res}]:"))
+        except:
+            rev = input(center(f"\n\nreversed?:[{rc}y{res},{rc}n{res}]:"))
+        if rev.lower() == 'y':
+            rev = True
+        elif rev.lower() == 'n':
+            rev = False
+        r = scav.Sorting(getfile("File to be Sorted"),rev)
+        namy =  '[Item - Sorter] {'+str(datetime.datetime.now())[:-7].replace(':','-')+'}.txt'
+        try:
+                os.mkdir(os.getcwd()+"\\output")
+        except:
+                pass
+        with open(f"{os.getcwd()}\\output\\{namy}",'a',encoding="utf-8",errors="ignore")as a:
+            for line in r:
+                a.write(line.strip()+'\n')
 
-        elif int(choice) == 2:
-            scav.comboscavanger(getcombo("Folder"))
+    elif int(choice) == 2:
+        scav.comboscavanger(getcombo("Folder"))
 
-        elif int(choice) == 3:
-            try:
-                r = input("what filetype:")
-            except:
-                r = input("what filetype:")
-            deleter = delete(r)
-            deleter.filedeleter(getcombo("Main-Folder"))
+    elif int(choice) == 3:
+        try:
+            r = input("what filetype:")
+        except:
+            r = input("what filetype:")
+        deleter = delete(r)
+        deleter.filedeleter(getcombo("Main-Folder"))
 
-        elif int(choice) == 4:
-            break
-    except:
+    elif int(choice) == 4:
         pass
+except:
+    pass
         
 exit()
       
